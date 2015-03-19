@@ -18,5 +18,13 @@ $(document).ready(function(){
       $("#room-name").val("");
     });
   });
+  $('#rooms').on('click', 'li a', function() {
+    currentRoomId = $(this).attr("id");
+    socket.send(JSON.stringify({
+              "MessageType": 1,
+              "Content": "enter room:" + currentRoomId
+            }));
+    console.log(currentRoomId);
+  });
 });
 </script>

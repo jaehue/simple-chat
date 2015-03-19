@@ -15,6 +15,32 @@
         </div>
       </div>
     </div>
-    
+    <script type="text/javascript">
+      var socket = null;
+      var currentRoomId = null;
+      $(function(){
+        if (!window["WebSocket"]) {
+            console.log("Error: Your browser does not support web sockets.")
+          } else {
+            socket = new WebSocket("ws://{{.Host}}/ws");
+            socket.onclose = function() {
+              console.log("Connection has been closed.");
+            }
+            socket.onmessage = function(e) {
+              var msg = eval("("+e.data+")");
+              messages.append(
+                $("<li>").append(
+                  $("<img>").attr("title", msg.Name).css({
+                    width:50,
+                    verticalAlign:"middle"
+                  }).attr("src", msg.AvatarURL),
+                  $("<strong>").text(msg.Name + ": "),
+                  $("<span>").text(msg.Content)
+                )
+              );
+            }
+          }
+      });
+    </script>
   </body>
 </html>

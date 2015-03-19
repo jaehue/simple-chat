@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -30,7 +31,11 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		t.templ = template.Must(template.ParseFiles(views...))
 	})
 
-	t.templ.Execute(w, nil)
+	data := map[string]interface{}{
+		"Host": r.Host,
+	}
+
+	t.templ.Execute(w, data)
 }
 
 func createRoom(w http.ResponseWriter, r *http.Request) {
@@ -53,11 +58,33 @@ func createRoom(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+const socketBufferSize = 1024
+
+var upgrader = &websocket.Upgrader{
+	ReadBufferSize:  socketBufferSize,
+	WriteBufferSize: socketBufferSize,
+}
+
+func handleWebsocket(w http.ResponseWriter, req *http.Request) {
+	socket, err := upgrader.Upgrade(w, req, nil)
+	if err != nil {
+		log.Fatal("ServeHTTP:", err)
+		return
+	}
+	log.Println("connect socket", socket)
+
+	for {
+		_, m, _ := socket.ReadMessage()
+		log.Println(string(m))
+	}
+}
+
 func main() {
 	r := mux.NewRouter()
 
 	r.Handle("/", &templateHandler{filename: "index.html"})
 	r.HandleFunc("/rooms", createRoom).Methods("POST")
+	http.HandleFunc("/ws", handleWebsocket)
 
 	http.Handle("/", r)
 
