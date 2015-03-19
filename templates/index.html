@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Simple Chat</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-4">
+          {{template "rooms.html" .}}
+        </div>
+        <div class="col-xs-8">
+          {{template "message.html" .}}
+        </div>
+      </div>
+    </div>    
+  </body>
+</html>
