@@ -1,1 +1,22 @@
-rooms
+<div class="input-group">
+  <input id="room-name" type="text" class="form-control" placeholder="방 이름 입력">
+  <span class="input-group-btn">
+    <button id="create-room" class="btn btn-default" type="button">방 생성</button>
+  </span>
+</div>
+
+<ul id="rooms" class="nav">  
+</ul>
+<script>
+$(document).ready(function(){
+  $("#create-room").click(function(){
+    $.post("/rooms",JSON.stringify({name: $("#room-name").val()}),
+    function(data,status){
+      var room = JSON.parse(data);
+      $("#rooms").append($("<li>").append(
+        $("<a>").attr("id", room.Id).attr("href", "#").text(room.Name)));
+      $("#room-name").val("");
+    });
+  });
+});
+</script>
