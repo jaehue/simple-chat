@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -31,8 +33,33 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, nil)
 }
 
+func createRoom(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var room Room
+	decoder.Decode(&room)
+	if len(room.Name) == 0 {
+		http.Error(w, "name is required", http.StatusBadRequest)
+		return
+	}
+
+	newRoom := NewRoom(room.Name)
+
+	b, err := json.Marshal(newRoom)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	w.Write(b)
+}
+
 func main() {
-	http.Handle("/", &templateHandler{filename: "index.html"})
+	r := mux.NewRouter()
+
+	r.Handle("/", &templateHandler{filename: "index.html"})
+	r.HandleFunc("/rooms", createRoom).Methods("POST")
+
+	http.Handle("/", r)
 
 	// start the web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {
