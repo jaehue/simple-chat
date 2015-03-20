@@ -19,9 +19,10 @@ $(document).ready(function(){
     });
   });
   $('#rooms').on('click', 'li a', function() {
-    currentRoomId = $(this).attr("id");
+    currentRoomId = parseInt($(this).attr("id"));
     socket.send(JSON.stringify({
               "MessageType": 1,
+              "RoomId": currentRoomId,
               "Content": "enter room:" + currentRoomId
             }));
     console.log(currentRoomId);
