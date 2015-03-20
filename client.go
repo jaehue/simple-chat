@@ -15,7 +15,6 @@ const messageBufferSize = 256
 type Client struct {
 	conn *websocket.Conn
 	send chan *Message
-	room *Room
 }
 
 func newClient(conn *websocket.Conn) *Client {
@@ -33,17 +32,11 @@ func (c *Client) listen() {
 }
 
 func (c *Client) join(r *Room) {
-	c.room = r
 	r.join <- c
 }
 
 func (c *Client) leave(r *Room) {
-	if c.room != r {
-		return
-	}
-
 	r.leave <- c
-	c.room = nil
 }
 
 func (c *Client) read() (*Message, error) {
@@ -68,8 +61,10 @@ func (c *Client) readLoop() {
 			log.Println("read message error: ", err)
 			break
 		}
-		if m.MessageType == TextMessage && c.room != nil {
-			c.room.forward <- m
+		if m.MessageType == TextMessage {
+			if r := FindRoom(m.RoomId); r != nil {
+				r.forward <- m
+			}
 			continue
 		} else if m.MessageType == RoomAction {
 			if err := c.doRoomAction(m); err != nil {
@@ -87,7 +82,7 @@ func (c *Client) writeLoop() {
 	for msg := range c.send {
 		c.write(msg)
 	}
-	log.Printf("close connection. room: %s, Client: %v", c.room.Id, c)
+	log.Printf("close connection. Client: %v", c.conn.RemoteAddr())
 	c.conn.Close()
 }
 
@@ -98,7 +93,7 @@ func (c *Client) doRoomAction(m *Message) error {
 	if str := enterRgx.FindString(m.Content); len(str) > 0 {
 		id := strings.TrimSpace(str[len("enter room:"):])
 		if len(id) > 0 {
-			i, err := strconv.ParseUint(id, 0, 64)
+			i, err := strconv.Atoi(id)
 			if err != nil {
 				c.conn.WriteMessage(websocket.TextMessage, []byte("Room id is invalid"))
 				return fmt.Errorf("Room id is invalid. error: %v", err)
@@ -112,7 +107,7 @@ func (c *Client) doRoomAction(m *Message) error {
 	if str := leaveRgx.FindString(m.Content); len(str) > 0 {
 		id := strings.TrimSpace(str[len("leave room:"):])
 		if len(id) > 0 {
-			i, err := strconv.ParseUint(id, 0, 64)
+			i, err := strconv.Atoi(id)
 			if err != nil {
 				c.conn.WriteMessage(websocket.TextMessage, []byte("Room id is invalid"))
 				return fmt.Errorf("Room id is invalid. error: %v", err)
