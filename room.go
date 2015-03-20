@@ -7,7 +7,7 @@ import (
 )
 
 type Room struct {
-	Id      uint64
+	Id      int
 	Name    string
 	forward chan *Message
 	join    chan *Client
@@ -17,11 +17,11 @@ type Room struct {
 
 var (
 	mu        sync.Mutex
-	maxRoomId uint64 = 0
+	maxRoomId int32 = 0
 	rooms     []*Room
 )
 
-func FindRoom(id uint64) *Room {
+func FindRoom(id int) *Room {
 	for _, r := range rooms {
 		if r.Id == id {
 			return r
@@ -31,9 +31,9 @@ func FindRoom(id uint64) *Room {
 }
 
 func NewRoom(name string) *Room {
-	atomic.AddUint64(&maxRoomId, 1)
+	atomic.AddInt32(&maxRoomId, 1)
 	r := &Room{
-		Id:      maxRoomId,
+		Id:      int(maxRoomId),
 		Name:    name,
 		forward: make(chan *Message),
 		join:    make(chan *Client),
