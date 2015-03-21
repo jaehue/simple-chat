@@ -37,12 +37,23 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, data)
 }
 
-func createRoom(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+func handleRoom(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		b, err := json.Marshal(rooms)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Write(b)
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
+	if req.Method != "POST" {
+		return
+	}
+
+	decoder := json.NewDecoder(req.Body)
 	var room Room
 	decoder.Decode(&room)
 	if len(room.Name) == 0 {
@@ -80,7 +91,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.Handle("/", &templateHandler{filename: "index.html"})
-	http.HandleFunc("/rooms", createRoom)
+	http.HandleFunc("/rooms", handleRoom)
 	http.HandleFunc("/ws", handleWebsocket)
 
 	// start the web server

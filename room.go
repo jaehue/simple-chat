@@ -18,7 +18,7 @@ type Room struct {
 var (
 	mu        sync.Mutex
 	maxRoomId int32 = 0
-	rooms     []*Room
+	rooms           = make([]*Room, 0)
 )
 
 func FindRoom(id int) *Room {
