@@ -1,1 +1,55 @@
-messages
+<div class="page-header">
+  <h4>메세지 <small id="room-name"></small></h4>
+</div>
+
+<div class="panel panel-default">
+  <div id="messages" class="panel-body">    
+  </div>
+  <div class="panel-footer">
+    <form id="chatbox" class="input-group">
+      <input id="message" type="text" class="form-control" placeholder="메세지">
+      <span class="input-group-btn">
+        <input type="submit" value="Send" class="btn btn-default" disabled="true"/>
+      </span>
+    </div>    
+  </div>
+</div>
+<script type="text/javascript">
+function addMessage(message) {
+  $("#messages ul#" + message.RoomId).append(
+    $("<li>").append($("<strong>").text(message.Name + ": "),
+                     $("<span>").text(message.Content)));
+  console.log(message);
+}
+function createRoom(room) {
+  $("#messages").append(
+    $("<ul>").attr("id", room.Id)
+                .addClass("message hidden"));
+}
+function deactivateRoom(room) {
+  $("#messages ul#" + room.Id).addClass("hidden");
+  $(":submit").prop('disabled', true);
+}
+function activateRoom(room) {
+  $("small#room-name").text(room.Name);
+  $("#messages ul#" + room.Id).removeClass("hidden");
+  $(":submit").prop('disabled', false);
+}
+$(function(){
+  var msgBox = $("#chatbox input#message");
+  $("#chatbox").submit(function(){
+    if (!msgBox.val()) return false;
+    if (!socket) {
+      console.log("Error: There is no socket connection.");
+      return false;
+    }
+    socket.send(JSON.stringify({
+        "MessageType": 0,
+        "RoomId": currentRoom.Id,
+        "Content": msgBox.val()
+      }));
+    msgBox.val("");
+    return false;
+  });
+});
+</script>

@@ -1,31 +1,66 @@
+<div class="page-header">
+  <h4>채팅방 목록</h4>
+</div>
+<div id="rooms" class="list-group">  
+</div>
 <div class="input-group">
   <input id="room-name" type="text" class="form-control" placeholder="방 이름 입력">
   <span class="input-group-btn">
     <button id="create-room" class="btn btn-default" type="button">방 생성</button>
   </span>
 </div>
-
-<ul id="rooms" class="nav">  
-</ul>
 <script>
+var rooms = [];
+var currentRoom = {};
+
 $(document).ready(function(){
+  var enterRoom = function (room) {
+    console.log("enter", room);
+    if(currentRoom.Id) {
+      socket.send(JSON.stringify({
+                "MessageType": 1,
+                "RoomId": currentRoom.Id,
+                "Content": "leave"
+              }));
+      deactivateRoom(currentRoom);
+      $("#rooms #" + currentRoom.Id).removeClass("active")
+    }
+
+    currentRoom = room;
+
+    socket.send(JSON.stringify({
+              "MessageType": 1,
+              "RoomId": currentRoom.Id,
+              "Content": "enter"
+            }));
+    activateRoom(currentRoom);
+    $("#rooms #" + currentRoom.Id).addClass("active")
+  };
+  var roomClickAction = function(e) {    
+    e.preventDefault();
+    var roomId = parseInt($(this).attr("id"));
+    for (var i = 0; i < rooms.length; i++) {
+      if(rooms[i].Id == roomId) {
+        enterRoom(rooms[i])
+      }
+    };
+    return false;
+  };
   $("#create-room").click(function(){
     $.post("/rooms",JSON.stringify({name: $("#room-name").val()}),
     function(data,status){
       var room = JSON.parse(data);
-      $("#rooms").append($("<li>").append(
-        $("<a>").attr("id", room.Id).attr("href", "#").text(room.Name)));
+      $("#rooms").prepend(
+        $("<a>").attr("id", room.Id)
+                .attr("href", "#")
+                .text(room.Name)
+                .addClass("list-group-item")
+                .bind("click", roomClickAction));
       $("#room-name").val("");
+      rooms.push(room);
+      createRoom(room);
+      enterRoom(room);
     });
-  });
-  $('#rooms').on('click', 'li a', function() {
-    currentRoomId = parseInt($(this).attr("id"));
-    socket.send(JSON.stringify({
-              "MessageType": 1,
-              "RoomId": currentRoomId,
-              "Content": "enter room:" + currentRoomId
-            }));
-    console.log(currentRoomId);
   });
 });
 </script>
