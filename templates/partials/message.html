@@ -21,7 +21,7 @@ function addMessage(message) {
                      $("<span>").text(message.Content)));
   console.log(message);
 }
-function createRoom(room) {
+function createRoomMessage(room) {
   $("#messages").append(
     $("<ul>").attr("id", room.Id)
                 .addClass("message hidden"));

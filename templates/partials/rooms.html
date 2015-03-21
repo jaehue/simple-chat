@@ -36,6 +36,16 @@ $(document).ready(function(){
     activateRoom(currentRoom);
     $("#rooms #" + currentRoom.Id).addClass("active")
   };
+  var createRoom = function(room) {
+    $("#rooms").prepend(
+        $("<a>").attr("id", room.Id)
+                .attr("href", "#")
+                .text(room.Name)
+                .addClass("list-group-item")
+                .bind("click", roomClickAction));
+    $("#room-name").val("");
+    createRoomMessage(room);
+  };
   var roomClickAction = function(e) {
     e.preventDefault();
     var roomId = parseInt($(this).attr("id"));
@@ -49,18 +59,19 @@ $(document).ready(function(){
   $("#create-room").click(function(){
     $.post("/rooms",JSON.stringify({name: $("#room-name").val()}),
     function(data,status){
-      var room = JSON.parse(data);
-      $("#rooms").prepend(
-        $("<a>").attr("id", room.Id)
-                .attr("href", "#")
-                .text(room.Name)
-                .addClass("list-group-item")
-                .bind("click", roomClickAction));
-      $("#room-name").val("");
+      var room = JSON.parse(data);      
       rooms.push(room);
       createRoom(room);
       enterRoom(room);
     });
+  });
+  $.get("/rooms", function(data, status){
+    console.log(data, status);
+    var roomList = JSON.parse(data);    
+    for (var i = 0; i < roomList.length; i++) {
+      rooms.push(roomList[i]);
+      createRoom(roomList[i]);      
+    };
   });
 });
 </script>
