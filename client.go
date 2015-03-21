@@ -1,12 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -87,34 +83,13 @@ func (c *Client) writeLoop() {
 }
 
 func (c *Client) doRoomAction(m *Message) error {
-	enterRgx := regexp.MustCompile("enter room:.+")
-	leaveRgx := regexp.MustCompile("leave room:.+")
-
-	if str := enterRgx.FindString(m.Content); len(str) > 0 {
-		id := strings.TrimSpace(str[len("enter room:"):])
-		if len(id) > 0 {
-			i, err := strconv.Atoi(id)
-			if err != nil {
-				c.conn.WriteMessage(websocket.TextMessage, []byte("Room id is invalid"))
-				return fmt.Errorf("Room id is invalid. error: %v", err)
-			}
-			if r := FindRoom(i); r != nil {
-				c.join(r)
-			}
+	if m.Content == "enter" {
+		if r := FindRoom(m.RoomId); r != nil {
+			c.join(r)
 		}
-	}
-
-	if str := leaveRgx.FindString(m.Content); len(str) > 0 {
-		id := strings.TrimSpace(str[len("leave room:"):])
-		if len(id) > 0 {
-			i, err := strconv.Atoi(id)
-			if err != nil {
-				c.conn.WriteMessage(websocket.TextMessage, []byte("Room id is invalid"))
-				return fmt.Errorf("Room id is invalid. error: %v", err)
-			}
-			if r := FindRoom(i); r != nil {
-				c.leave(r)
-			}
+	} else if m.Content == "leave" {
+		if r := FindRoom(m.RoomId); r != nil {
+			c.leave(r)
 		}
 	}
 	return nil
