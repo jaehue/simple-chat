@@ -8,11 +8,11 @@
       ul#messages li     { margin-bottom: 2px; }
       ul#messages li img { margin-right: 10px; }
       input { display: block; }
-      ul    { list-style: none; }      
+      ul    { list-style: none; }
     </style>
     <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
   </head>
-  <body>  
+  <body>
     <div class="container">
       <div class="row">
         <div class="col-xs-4">
@@ -24,7 +24,7 @@
       </div>
     </div>
     <script type="text/javascript">
-      var socket = null;      
+      var socket = null;
       $(function(){
         if (!window["WebSocket"]) {
             console.log("Error: Your browser does not support web sockets.")
