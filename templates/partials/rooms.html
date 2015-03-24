@@ -44,7 +44,7 @@ $(document).ready(function(){
                 .addClass("list-group-item")
                 .bind("click", roomClickAction));
     $("#room-name").val("");
-    createRoomMessage(room);
+    createMessageBox(room);
   };
   var roomClickAction = function(e) {
     e.preventDefault();
