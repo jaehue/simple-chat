@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -70,23 +69,6 @@ func handleRoom(w http.ResponseWriter, req *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 	w.Write(b)
-}
-
-const socketBufferSize = 1024
-
-var upgrader = &websocket.Upgrader{
-	ReadBufferSize:  socketBufferSize,
-	WriteBufferSize: socketBufferSize,
-}
-
-func handleWebsocket(w http.ResponseWriter, r *http.Request) {
-	socket, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal("ServeHTTP:", err)
-		return
-	}
-	log.Println("connect socket. addr: ", socket.RemoteAddr())
-	newClient(socket)
 }
 
 func main() {
