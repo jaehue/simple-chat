@@ -49,10 +49,10 @@ function deactivateRoom(room) {
 function activateRoom(room) {
   $("small#room-name").text(room.Name);
   $("#messages ul#" + room.Id).removeClass("hidden");
-  $(":submit").prop('disabled', false);
 
   for (var i = 0; i < myRooms.length; i++) {
     if(myRooms[i].Id == room.Id) {
+      $(":submit").prop('disabled', false);
       return;
     }
   };
