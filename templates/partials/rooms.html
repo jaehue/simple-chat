@@ -12,31 +12,23 @@
 <script>
 var rooms = [];
 var currentRoom = {};
-
+var myRooms = [];
 $(document).ready(function(){
   var enterRoom = function (room) {
     console.log("enter", room);
+
     if(currentRoom.Id) {
-      socket.send(JSON.stringify({
-                "MessageType": 1,
-                "RoomId": currentRoom.Id,
-                "Content": "leave"
-              }));
       deactivateRoom(currentRoom);
       $("#rooms #" + currentRoom.Id).removeClass("active")
     }
 
     currentRoom = room;
 
-    socket.send(JSON.stringify({
-              "MessageType": 1,
-              "RoomId": currentRoom.Id,
-              "Content": "enter"
-            }));
     activateRoom(currentRoom);
+
     $("#rooms #" + currentRoom.Id).addClass("active")
   };
-  var createRoom = function(room) {
+  var createRoomBox = function(room) {
     $("#rooms").prepend(
         $("<a>").attr("id", room.Id)
                 .attr("href", "#")
@@ -59,18 +51,21 @@ $(document).ready(function(){
   $("#create-room").click(function(){
     $.post("/rooms",JSON.stringify({name: $("#room-name").val()}),
     function(data,status){
-      var room = JSON.parse(data);      
+      var room = JSON.parse(data);
+      console.log('create room', room);
+      createRoomBox(room);
       rooms.push(room);
-      createRoom(room);
+      joinRoom(room);
+      myRooms.push(room);
       enterRoom(room);
     });
   });
   $.get("/rooms", function(data, status){
     console.log(data, status);
-    var roomList = JSON.parse(data);    
+    var roomList = JSON.parse(data);
     for (var i = 0; i < roomList.length; i++) {
       rooms.push(roomList[i]);
-      createRoom(roomList[i]);      
+      createRoomBox(roomList[i]);
     };
   });
 });

@@ -11,9 +11,25 @@
       <span class="input-group-btn">
         <input type="submit" value="Send" class="btn btn-default" disabled="true"/>
       </span>
+    </form>
+  </div>
+</div>
+
+<div id="join-modal" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">대화에 참여하시겠습니까?</h4>
+      </div>
+      <div class="modal-body">
+        <button id="join-btn" type="button" class="btn btn-info">참여</button>
+        <button id="cancel-btn" type="button" class="btn btn-warning">취소</button>
+      </div>
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
 function addMessage(message) {
   $("#messages ul#" + message.RoomId).append(
@@ -34,9 +50,37 @@ function activateRoom(room) {
   $("small#room-name").text(room.Name);
   $("#messages ul#" + room.Id).removeClass("hidden");
   $(":submit").prop('disabled', false);
+
+  for (var i = 0; i < myRooms.length; i++) {
+    if(myRooms[i].Id == room.Id) {
+      return;
+    }
+  };
+  $('#join-modal').modal('show');
+}
+function joinRoom (room) {
+  socket.send(JSON.stringify({
+              "MessageType": 1,
+              "RoomId": room.Id,
+              "Content": "enter"
+            }));
+  myRooms.push(room);
 }
 $(function(){
   var msgBox = $("#chatbox input#message");
+  $("#join-btn").click(function(e){
+    e.preventDefault();
+    joinRoom(currentRoom);
+    activateRoom(currentRoom);
+    $('#join-modal').modal('hide');
+    return false;
+  });
+  $("#cancel-btn").click(function(e){
+    e.preventDefault();
+    deactivateRoom(currentRoom);
+    $('#join-modal').modal('hide');
+    return false;
+  })
   $("#chatbox").submit(function(){
     if (!msgBox.val()) return false;
     if (!socket) {
