@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"log"
 	"time"
 )
@@ -9,14 +8,14 @@ import (
 const messageBufferSize = 256
 
 type Client struct {
-	conn *websocket.Conn
+	Messager
 	send chan *Message
 }
 
-func newClient(conn *websocket.Conn) *Client {
+func newClient(messager Messager) *Client {
 	c := &Client{
-		conn: conn,
-		send: make(chan *Message, messageBufferSize),
+		Messager: messager,
+		send:     make(chan *Message, messageBufferSize),
 	}
 	c.listen()
 	return c
@@ -36,18 +35,18 @@ func (c *Client) leave(r *Room) {
 }
 
 func (c *Client) read() (*Message, error) {
-	var msg *Message
-	if err := c.conn.ReadJSON(&msg); err != nil {
+	var msg Message
+	if err := c.ReadChatMessage(&msg); err != nil {
 		return nil, err
 	}
 	msg.CreatedAt = time.Now()
 	log.Println("read from websocket:", msg)
-	return msg, nil
+	return &msg, nil
 }
 
 func (c *Client) write(m *Message) error {
 	log.Println("write to websocket:", m)
-	return c.conn.WriteJSON(m)
+	return c.WriteChatMessage(m)
 }
 
 func (c *Client) readLoop() {
@@ -65,21 +64,21 @@ func (c *Client) readLoop() {
 		} else if m.MessageType == RoomAction {
 			if err := c.doRoomAction(m); err != nil {
 				log.Println(err)
-				c.conn.WriteJSON(struct{ Status, Message string }{Status: "Fail", Message: err.Error()})
+				c.WriteChatMessage(&Message{MessageType: ChatError, Content: err.Error()})
 			}
 		}
 
 	}
-	log.Printf("close connection. addr: %s", c.conn.RemoteAddr())
-	c.conn.Close()
+	log.Printf("close connection. Client: %v", c)
+	c.Close()
 }
 
 func (c *Client) writeLoop() {
 	for msg := range c.send {
 		c.write(msg)
 	}
-	log.Printf("close connection. Client: %v", c.conn.RemoteAddr())
-	c.conn.Close()
+	log.Printf("close connection. Client: %v", c)
+	c.Close()
 }
 
 func (c *Client) doRoomAction(m *Message) error {

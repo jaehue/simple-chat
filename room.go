@@ -56,7 +56,7 @@ func (r *Room) broadcast(m *Message) {
 		default:
 			// failed to send
 			delete(r.clients, client)
-			client.conn.Close()
+			client.Close()
 		}
 	}
 }
