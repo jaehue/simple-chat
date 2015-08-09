@@ -9,13 +9,17 @@ const messageBufferSize = 256
 
 type Client struct {
 	Messager
-	send chan *Message
+	Name      string
+	AvatarURL string
+	send      chan *Message
 }
 
-func newClient(messager Messager) *Client {
+func newClient(messager Messager, name, avatarUrl string) *Client {
 	c := &Client{
-		Messager: messager,
-		send:     make(chan *Message, messageBufferSize),
+		Messager:  messager,
+		Name:      name,
+		AvatarURL: avatarUrl,
+		send:      make(chan *Message, messageBufferSize),
 	}
 	c.listen()
 	return c
@@ -40,6 +44,8 @@ func (c *Client) read() (*Message, error) {
 		return nil, err
 	}
 	msg.CreatedAt = time.Now()
+	msg.Name = c.Name
+	msg.AvatarURL = c.AvatarURL
 	log.Println("read from websocket:", msg)
 	return &msg, nil
 }

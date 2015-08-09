@@ -57,7 +57,7 @@ func (c *tcpConn) String() string {
 
 func handleTcp(c net.Conn) {
 	tcpConn := &tcpConn{Conn: c}
-	newClient(tcpConn)
+	newClient(tcpConn, "", "")
 }
 
 func runTcp(addr string) {

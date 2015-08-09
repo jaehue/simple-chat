@@ -15,8 +15,10 @@ type MessageType int
 type Message struct {
 	MessageType
 	RoomId    int
+	AvatarURL string
 	Content   string
 	CreatedAt time.Time
+	Name      string
 }
 
 type Messager interface {

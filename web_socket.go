@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/stretchr/objx"
 )
 
 const socketBufferSize = 1024
@@ -24,7 +26,13 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("connect socket. addr: ", socket.RemoteAddr())
 	var messager webSocketConn = webSocketConn(*socket)
-	newClient(&messager)
+
+	var userData map[string]interface{}
+	if authCookie, err := r.Cookie("auth"); err == nil {
+		userData = objx.MustFromBase64(authCookie.Value)
+	}
+
+	newClient(&messager, userData["name"].(string), userData["avatar_url"].(string))
 }
 
 func (c *webSocketConn) ReadChatMessage(msg *Message) error {
