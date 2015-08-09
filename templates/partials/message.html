@@ -35,10 +35,7 @@
 <script type="text/javascript">
 function addMessage(message) {
   $("#messages ul#" + message.RoomId).append(
-    $("<li>").append($("<img>").css({
-        width:50,
-        verticalAlign:"middle"
-      }).attr("src", message.AvatarURL),
+    $("<li>").append($("<img>").addClass("img-rounded").css({width:30}).attr("src", message.AvatarURL),
     $("<strong>").text(message.Name + ": "),
                      $("<span>").text(message.Content)));
   console.log(message);
