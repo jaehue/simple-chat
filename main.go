@@ -16,6 +16,10 @@ type templateHandler struct {
 	templ    *template.Template
 }
 
+type authHandler struct {
+	next http.Handler
+}
+
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		var views []string
@@ -72,8 +76,27 @@ func handleRoom(w http.ResponseWriter, req *http.Request) {
 	w.Write(b)
 }
 
+func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if _, err := r.Cookie("auth"); err == http.ErrNoCookie {
+		// not authenticated
+		w.Header().Set("Location", "/login")
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	} else if err != nil {
+		// error
+		panic(err.Error())
+	} else {
+		// success. call the next handler
+		h.next.ServeHTTP(w, r)
+	}
+}
+func MustAuth(handler http.Handler) http.Handler {
+	return &authHandler{next: handler}
+}
+
 func main() {
-	http.Handle("/", &templateHandler{filename: "index.html"})
+	http.Handle("/", MustAuth(&templateHandler{filename: "index.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
 	http.HandleFunc("/rooms", handleRoom)
 	http.HandleFunc("/ws", handleWebsocket)
 
