@@ -1,6 +1,11 @@
 <div class="page-header">
   <h4>채팅방 목록</h4>
 </div>
+<script>
+  var rooms = [];
+  var currentRoom = {};
+  var myRooms = [];
+</script>
 <div id="rooms" class="list-group">
 </div>
 <div class="input-group">
@@ -10,9 +15,6 @@
   </span>
 </div>
 <script>
-var rooms = [];
-var currentRoom = {};
-var myRooms = [];
 $(document).ready(function(){
   var enterRoom = function (room) {
     console.log("enter", room);
@@ -28,6 +30,7 @@ $(document).ready(function(){
 
     $("#rooms #" + currentRoom.Id).addClass("active")
   };
+
   var createRoomBox = function(room) {
     $("#rooms").prepend(
         $("<a>").attr("id", room.Id)
@@ -38,6 +41,7 @@ $(document).ready(function(){
     $("#room-name").val("");
     createMessageBox(room);
   };
+
   var roomClickAction = function(e) {
     e.preventDefault();
     var roomId = parseInt($(this).attr("id"));
@@ -48,6 +52,7 @@ $(document).ready(function(){
     };
     return false;
   };
+
   $("#create-room").click(function(){
     $.post("/rooms",JSON.stringify({name: $("#room-name").val()}),
     function(data,status){
@@ -59,13 +64,10 @@ $(document).ready(function(){
       enterRoom(room);
     });
   });
-  $.get("/rooms", function(data, status){
-    console.log(data, status);
-    var roomList = JSON.parse(data);
-    for (var i = 0; i < roomList.length; i++) {
-      rooms.push(roomList[i]);
-      createRoomBox(roomList[i]);
-    };
-  });
+
+  var rooms = {{.Rooms}};
+  for (var i = 0; i < rooms.length; i++) {
+    createRoomBox(rooms[i]);
+  };
 });
 </script>
