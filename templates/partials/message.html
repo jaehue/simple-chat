@@ -7,7 +7,8 @@
   </div>
   <div class="panel-footer">
     <form id="chatbox" class="input-group">
-    {{.UserData.name}}:
+      <img src="{{.UserData.avatar_url}}" class="img-rounded" width="30">
+      {{.UserData.name}}:
       <input id="message" type="text" class="form-control" placeholder="메세지">
       <span class="input-group-btn">
         <input type="submit" value="Send" class="btn btn-default" disabled="true"/>
