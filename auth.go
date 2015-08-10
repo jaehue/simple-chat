@@ -7,8 +7,24 @@ import (
 	"strings"
 
 	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/facebook"
+	"github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/gomniauth/providers/google"
 	"github.com/stretchr/objx"
 )
+
+func init() {
+	// set up gomniauth
+	gomniauth.SetSecurityKey("some long key")
+	gomniauth.WithProviders(
+		facebook.New("key", "secret",
+			"http://localhost:8080/auth/callback/facebook"),
+		github.New("key", "secret",
+			"http://localhost:8080/auth/callback/github"),
+		google.New("636296155193-3u8lt2kmcr42mt49qmcvoq726dv9q9kj.apps.googleusercontent.com", "pq9s2KpbPyt6g-0kDM_ef-7F",
+			"http://localhost:8080/auth/callback/google"),
+	)
+}
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	segs := strings.Split(r.URL.Path, "/")
