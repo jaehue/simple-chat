@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/stretchr/objx"
+	"github.com/wblakecaldwell/profiler"
 )
 
 type templateHandler struct {
@@ -20,6 +21,11 @@ type templateHandler struct {
 
 type authHandler struct {
 	next http.Handler
+}
+
+func init() {
+	profiler.AddMemoryProfilingHandlers()
+	profiler.StartProfiling()
 }
 
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
