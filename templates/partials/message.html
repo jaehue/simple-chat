@@ -6,27 +6,14 @@
   <div id="messages" class="panel-body">
   </div>
   <div class="panel-footer">
-    <form id="chatbox" class="input-group">
-      <img src="{{.UserData.avatar_url}}" class="img-rounded" width="30">
-      {{.UserData.name}}:
-      <input id="message" type="text" class="form-control" placeholder="메세지">
-      <span class="input-group-btn">
-        <input type="submit" value="Send" class="btn btn-default" disabled="true"/>
-      </span>
-    </form>
-  </div>
-</div>
-
-<div id="join-modal" class="modal fade">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">대화에 참여하시겠습니까?</h4>
+    <div class="media">
+      <div class="media-left">
+        <img src="{{.UserData.avatar_url}}" class="img-thumb" width="32">
       </div>
-      <div class="modal-body">
-        <button id="join-btn" type="button" class="btn btn-info">참여</button>
-        <button id="cancel-btn" type="button" class="btn btn-warning">취소</button>
+      <div class="media-body">
+        <form id="chatbox">
+          <input type="text" class="form-control" id="message" placeholder="메세지를 입력하세요">      
+        </form>
       </div>
     </div>
   </div>
@@ -34,20 +21,22 @@
 
 <script type="text/javascript">
 function addMessage(message) {
-  $("#messages ul#" + message.RoomId).append(
-    $("<li>").append($("<img>").addClass("img-rounded").css({width:30}).attr("src", message.AvatarURL),
-    $("<strong>").text(message.Name + ": "),
-                     $("<span>").text(message.Content)));
   console.log(message);
+  var img = $("<div>").addClass("media-left").append($("<img>").addClass("img-thumb").css({width:30}).attr("src", message.AvatarURL));
+  var msg = $("<div>").addClass("media-body").append($("<strong>").text(message.Name + ": "),$("<span>").text(message.Content));
+  
+  $("#messages ul#" + message.RoomId).append(
+    $("<div>").addClass("media").append(img, msg)    
+    );  
 }
 function createMessageBox(room) {
   $("#messages").append(
-    $("<ul>").attr("id", room.Id)
+    $("<ul>").addClass("list-unstyled").attr("id", room.Id)
                 .addClass("message hidden"));
 }
 function deactivateRoom(room) {
   $("#messages ul#" + room.Id).addClass("hidden");
-  $(":submit").prop('disabled', true);
+  $("#chatbox").prop('disabled', true);
 }
 function activateRoom(room) {
   $("small#room-name").text(room.Name);
@@ -55,11 +44,10 @@ function activateRoom(room) {
 
   for (var i = 0; i < myRooms.length; i++) {
     if(myRooms[i].Id == room.Id) {
-      $(":submit").prop('disabled', false);
+      $("#chatbox").prop('disabled', false);
       return;
     }
   };
-  $('#join-modal').modal('show');
 }
 function joinRoom (room) {
   socket.send(JSON.stringify({
@@ -75,13 +63,11 @@ $(function(){
     e.preventDefault();
     joinRoom(currentRoom);
     activateRoom(currentRoom);
-    $('#join-modal').modal('hide');
     return false;
   });
   $("#cancel-btn").click(function(e){
     e.preventDefault();
     deactivateRoom(currentRoom);
-    $('#join-modal').modal('hide');
     return false;
   })
   $("#chatbox").submit(function(){

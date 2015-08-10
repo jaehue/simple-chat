@@ -8,12 +8,12 @@
 </script>
 <div id="rooms" class="list-group">
 </div>
-<div class="input-group">
+<form class="input-group">
   <input id="room-name" type="text" class="form-control" placeholder="방 이름 입력">
   <span class="input-group-btn">
-    <button id="create-room" class="btn btn-default" type="button">방 생성</button>
+    <button id="create-room" class="btn btn-default" type="submit">방 생성</button>
   </span>
-</div>
+</form>
 <script>
 $(document).ready(function(){
   var enterRoom = function (room) {
