@@ -58,18 +58,7 @@ function joinRoom (room) {
   myRooms.push(room);
 }
 $(function(){
-  var msgBox = $("#chatbox input#message");
-  $("#join-btn").click(function(e){
-    e.preventDefault();
-    joinRoom(currentRoom);
-    activateRoom(currentRoom);
-    return false;
-  });
-  $("#cancel-btn").click(function(e){
-    e.preventDefault();
-    deactivateRoom(currentRoom);
-    return false;
-  })
+  var msgBox = $("#chatbox input#message");  
   $("#chatbox").submit(function(){
     if (!msgBox.val()) return false;
     if (!socket) {
