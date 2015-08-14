@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
-	"github.com/stretchr/objx"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/gorilla/websocket"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/objx"
 )
 
 const socketBufferSize = 1024

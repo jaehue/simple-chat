@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/stretchr/gomniauth"
-	"github.com/stretchr/gomniauth/providers/facebook"
-	"github.com/stretchr/gomniauth/providers/github"
-	"github.com/stretchr/gomniauth/providers/google"
-	"github.com/stretchr/objx"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/gomniauth"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/gomniauth/providers/facebook"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/gomniauth/providers/github"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/gomniauth/providers/google"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/objx"
 )
 
 func init() {
