@@ -123,6 +123,8 @@ func main() {
 
 	http.HandleFunc("/rooms", handleRoom)
 	http.HandleFunc("/ws", handleWebsocket)
+	http.HandleFunc("/info", info)
+	http.HandleFunc("/connections", connections)
 
 	// start the web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {

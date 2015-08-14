@@ -7,6 +7,8 @@ import (
 
 const messageBufferSize = 256
 
+var clients = make([]*Client, 0)
+
 type Client struct {
 	Messager
 	Name      string
@@ -22,6 +24,7 @@ func newClient(messager Messager, name, avatarUrl string) *Client {
 		send:      make(chan *Message, messageBufferSize),
 	}
 	c.listen()
+	clients = append(clients, c)
 	return c
 }
 
