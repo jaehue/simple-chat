@@ -1,1 +1,1 @@
-web: ./simple-chat
+web: simple-chat
