@@ -11,20 +11,28 @@ var clients = make([]*Client, 0)
 
 type Client struct {
 	Messager
-	Name      string
-	AvatarURL string
-	send      chan *Message
+	Name        string
+	AvatarURL   string
+	send        chan *Message
+	ConnectedAt time.Time
+	IsActive    bool
 }
 
 func newClient(messager Messager, name, avatarUrl string) *Client {
 	c := &Client{
-		Messager:  messager,
-		Name:      name,
-		AvatarURL: avatarUrl,
-		send:      make(chan *Message, messageBufferSize),
+		Messager:    messager,
+		Name:        name,
+		AvatarURL:   avatarUrl,
+		send:        make(chan *Message, messageBufferSize),
+		ConnectedAt: time.Now(),
+		IsActive:    true,
 	}
 	c.listen()
 	clients = append(clients, c)
+	go func() {
+		<-c.Quit()
+		c.IsActive = false
+	}()
 	return c
 }
 

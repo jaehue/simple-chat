@@ -11,7 +11,10 @@ import (
 
 const socketBufferSize = 1024
 
-type webSocketConn websocket.Conn
+type webSocketConn struct {
+	websocket.Conn
+	quit chan struct{}
+}
 
 var upgrader = &websocket.Upgrader{
 	ReadBufferSize:  socketBufferSize,
@@ -25,7 +28,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("connect socket. addr: ", socket.RemoteAddr())
-	var messager webSocketConn = webSocketConn(*socket)
+	messager := webSocketConn{*socket, make(chan struct{})}
 
 	var userData map[string]interface{}
 	if authCookie, err := r.Cookie("auth"); err == nil {
@@ -36,9 +39,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *webSocketConn) ReadChatMessage(msg *Message) error {
-	var conn websocket.Conn = websocket.Conn(*c)
-
-	if err := conn.ReadJSON(&msg); err != nil {
+	if err := c.Conn.ReadJSON(&msg); err != nil {
 		return err
 	}
 	msg.CreatedAt = time.Now()
@@ -47,16 +48,18 @@ func (c *webSocketConn) ReadChatMessage(msg *Message) error {
 }
 
 func (c *webSocketConn) WriteChatMessage(msg *Message) error {
-	var conn websocket.Conn = websocket.Conn(*c)
-	return conn.WriteJSON(msg)
+	return c.Conn.WriteJSON(msg)
 }
 
 func (c *webSocketConn) Close() error {
-	var conn websocket.Conn = websocket.Conn(*c)
-	return conn.Close()
+	c.quit <- struct{}{}
+	return c.Conn.Close()
 }
 
-func (c *webSocketConn) String() string {
-	var conn websocket.Conn = websocket.Conn(*c)
-	return conn.RemoteAddr().String()
+func (c *webSocketConn) RemoteAddr() string {
+	return c.Conn.RemoteAddr().String()
+}
+
+func (c *webSocketConn) Quit() <-chan struct{} {
+	return c.quit
 }

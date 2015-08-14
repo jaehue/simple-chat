@@ -22,6 +22,8 @@ type Message struct {
 }
 
 type Messager interface {
+	Quit() <-chan struct{}
+	RemoteAddr() string
 	ReadChatMessage(*Message) error
 	WriteChatMessage(*Message) error
 	Close() error

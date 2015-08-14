@@ -51,8 +51,12 @@ func (c *tcpConn) Close() error {
 	return nil
 }
 
-func (c *tcpConn) String() string {
-	return c.RemoteAddr().String()
+func (c *tcpConn) RemoteAddr() string {
+	return c.RemoteAddr()
+}
+
+func (c *tcpConn) Quit() <-chan struct{} {
+	return nil
 }
 
 func handleTcp(c net.Conn) {

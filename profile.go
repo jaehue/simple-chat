@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -30,12 +31,20 @@ func info(w http.ResponseWriter, req *http.Request) {
 func connections(w http.ResponseWriter, req *http.Request) {
 	users := []interface{}{}
 	for _, c := range clients {
+		if !c.IsActive {
+			continue
+		}
+		d := time.Now().Sub(c.ConnectedAt)
+		m := int(d.Minutes())
+		s := int((d - time.Minute*time.Duration(m)).Seconds())
 		users = append(users, map[string]interface{}{
-			"Name": c.Name,
+			"Name":            c.Name,
+			"Addr":            c.Messager.RemoteAddr(),
+			"SessionDuration": fmt.Sprintf("%dm%ds", m, s),
 		})
 	}
 	info := map[string]interface{}{
-		"CurrentUserCount":            len(clients),
+		"CurrentUserCount":            len(users),
 		"CurrentlyAuthenticatedUsers": users,
 	}
 
