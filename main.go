@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -127,7 +128,7 @@ func main() {
 	http.HandleFunc("/connections", connections)
 
 	// start the web server
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 }
