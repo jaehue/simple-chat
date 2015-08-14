@@ -22,7 +22,7 @@ func init() {
 		github.New("key", "secret",
 			"http://localhost:8080/auth/callback/github"),
 		google.New("636296155193-3u8lt2kmcr42mt49qmcvoq726dv9q9kj.apps.googleusercontent.com", "pq9s2KpbPyt6g-0kDM_ef-7F",
-			"http://localhost:8080/auth/callback/google"),
+			"http://simplechat.jang.io/auth/callback/google"),
 	)
 }
 
