@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/stretchr/objx"
-	"github.com/wblakecaldwell/profiler"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/stretchr/objx"
+	"github.com/jaehue/simple-chat/Godeps/_workspace/src/github.com/wblakecaldwell/profiler"
 )
 
 type templateHandler struct {
