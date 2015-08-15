@@ -14,6 +14,7 @@ var (
 
 func init() {
 	StartTime = time.Now()
+	ServiceVersion = "1.0.231.fd80bea-" + time.Now().Format("20060102.150405")
 }
 
 func info(w http.ResponseWriter, req *http.Request) {
